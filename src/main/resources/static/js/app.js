@@ -71,7 +71,10 @@ function initTabs() {
                 case 'admin':
                     loadAllRooms();
                     break;
-
+                case 'vedligehold':
+                    loadVedligeholdelser();
+                    loadRoomsDropdown();
+                    break;
             }
         })
     })
@@ -428,4 +431,162 @@ function resetSearch() {
     document.getElementById('searchInput').value = '';
     refreshAllData();
     map.setView([56.0, 10.5], 7);
+}
+
+
+// ============ VEDLIGEHOLDELSE ============
+
+function loadVedligeholdelser() {
+    fetch('/vedligehold')
+        .then(response => response.json())
+        .then(data => renderVedligeholdTable(data))
+        .catch(error => console.error('Fejl ved hentning af vedligeholdelser:', error));
+}
+
+function renderVedligeholdTable(vedligeholdelser) {
+    const tbody = document.querySelector('#vedligeholdTable tbody');
+    tbody.innerHTML = '';
+
+    vedligeholdelser.forEach(v => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${v.dato || ''}</td>
+            <td>${v.beskyttelsesrumAdresse || ''}</td>
+            <td>${v.beskrivelse || ''}</td>
+            <td>${v.udfoertAf || ''}</td>
+            <td><span class="status-badge status-${v.status}">${formatStatus(v.status)}</span></td>
+            <td>
+                <button class="btn-edit" onclick="editVedligehold(${v.id})">Rediger</button>
+                <button class="btn-delete" onclick="deleteVedligehold(${v.id})">Slet</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function formatStatus(status) {
+    const statusMap = {
+        'PLANLAGT': 'Planlagt',
+        'IGANGVAERENDE': 'Igangværende',
+        'UDFOERT': 'Udført',
+        'KLARGJORT': 'Klargjort'
+    };
+    return statusMap[status] || status;
+}
+
+function loadRoomsDropdown() {
+    fetch('/rooms')
+        .then(response => response.json())
+        .then(rooms => {
+            const select = document.getElementById('vedligeholdBeskyttelsesrumId');
+            select.innerHTML = '<option value="">Vælg beskyttelsesrum...</option>';
+            rooms.forEach(r => {
+                const option = document.createElement('option');
+                option.value = r.id;
+                option.textContent = `${r.adresse}, ${r.postalCode}`;
+                select.appendChild(option);
+            });
+        });
+}
+
+function openVedligeholdModal(id = null) {
+    const modal = document.getElementById('vedligeholdModal');
+    const title = document.getElementById('vedligeholdModalTitle');
+
+    loadRoomsDropdown();
+
+    if (id) {
+        title.textContent = 'Rediger vedligeholdelse';
+        loadVedligeholdIntoForm(id);
+    } else {
+        title.textContent = 'Opret vedligeholdelse';
+        clearVedligeholdForm();
+        document.getElementById('vedligeholdDato').value = new Date().toISOString().split('T')[0];
+    }
+
+    modal.classList.add('active');
+}
+
+function closeVedligeholdModal() {
+    document.getElementById('vedligeholdModal').classList.remove('active');
+    clearVedligeholdForm();
+}
+
+function clearVedligeholdForm() {
+    document.getElementById('vedligeholdForm').reset();
+    document.getElementById('vedligeholdId').value = '';
+}
+
+function loadVedligeholdIntoForm(id) {
+    fetch(`/vedligehold/${id}`)
+        .then(response => response.json())
+        .then(v => {
+            document.getElementById('vedligeholdId').value = v.id;
+            document.getElementById('vedligeholdBeskyttelsesrumId').value = v.beskyttelsesrumId;
+            document.getElementById('vedligeholdBeskrivelse').value = v.beskrivelse || '';
+            document.getElementById('vedligeholdDato').value = v.dato || '';
+            document.getElementById('vedligeholdStatus').value = v.status || 'PLANLAGT';
+            document.getElementById('vedligeholdUdfoertAf').value = v.udfoertAf || '';
+        });
+}
+
+function editVedligehold(id) {
+    openVedligeholdModal(id);
+}
+
+function deleteVedligehold(id) {
+    if (!confirm('Er du sikker på du vil slette denne vedligeholdelse?')) {
+        return;
+    }
+    fetch(`/vedligehold/${id}`, {method: 'DELETE'})
+        .then(() => {
+            loadVedligeholdelser();
+            alert('Vedligeholdelse slettet');
+        })
+        .catch(error => console.error('Fejl ved sletning:', error));
+}
+
+// Init vedligehold form
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('vedligeholdForm');
+    if (form) {
+        form.addEventListener('submit', handleVedligeholdSubmit);
+    }
+});
+
+function handleVedligeholdSubmit(e) {
+    e.preventDefault();
+
+    const id = document.getElementById('vedligeholdId').value;
+    const data = {
+        beskyttelsesrumId: document.getElementById('vedligeholdBeskyttelsesrumId').value,
+        beskrivelse: document.getElementById('vedligeholdBeskrivelse').value,
+        dato: document.getElementById('vedligeholdDato').value,
+        status: document.getElementById('vedligeholdStatus').value,
+        udfoertAf: document.getElementById('vedligeholdUdfoertAf').value
+    };
+
+    if (id) {
+        fetch(`/vedligehold/${id}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+            .then(() => {
+                closeVedligeholdModal();
+                loadVedligeholdelser();
+            })
+            .catch(error => console.error('Fejl ved opdatering:', error));
+    } else {
+        fetch('/vedligehold', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+            .then(() => {
+                closeVedligeholdModal();
+                loadVedligeholdelser();
+            })
+            .catch(error => console.error('Fejl ved oprettelse:', error));
+    }
 }
