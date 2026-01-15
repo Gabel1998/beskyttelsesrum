@@ -128,15 +128,15 @@ function renderRoomsTable(rooms) {
     rooms.forEach(room => {
         const row = document.createElement('tr');
         row.innerHTML = `
-        <td>${room.id}</td>
-        <td>${room.adresse}</td>
-        <td>${room.postalCode}</td>
-        <td>${room.kapacitet}</td>
-        <td>
-        <button class="btn btn-edit" onclick="edit(${room.id})">Rediger</button>
-        <button class="btn btn-delete" onclick="deleteRoom(${room.id})">Slet</button>
-        </td>
-        `;
+                <td>${room.adresse}</td>
+                <td>${room.postalCode}</td>
+                <td>${room.kapacitet}</td>
+                <td>${room.kommuneNavn}</td>
+                <td>
+                    <button class="btn-edit" onclick="editRoom(${room.id})">Rediger</button>
+                    <button class="btn-delete" onclick="deleteRoom(${room.id})">Slet</button>
+                </td>
+            `;
         tbody.appendChild(row);
     });
 }
@@ -156,8 +156,8 @@ function handleSubmit(e) {
         adresse: document.getElementById(`adresse`).value,
         postalCode: document.getElementById(`postalCode`).value,
         kapacitet: parseInt(document.getElementById(`kapacitetInput`).value),
-        latitude: parseInt(document.getElementById(`latitude`).value),
-        longitude: parseInt(document.getElementById(`longitude`).value),
+        latitude: parseFloat(document.getElementById(`latitude`).value),
+        longitude: parseFloat(document.getElementById(`longitude`).value),
         kommuneId: document.getElementById(`kommuneId`).value
     };
 
