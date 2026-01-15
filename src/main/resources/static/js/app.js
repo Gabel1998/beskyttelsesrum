@@ -5,6 +5,12 @@
 let map;
 let markers = [];
 
+let statsData = {
+    kommunerMedRum: new Set(),
+    totalRooms: 0,
+    totalKapacitet: 0
+};
+
 // ============ INITIALISERING ============
 document.addEventListener("DOMContentLoaded", function () {
     initTabs();
@@ -35,10 +41,14 @@ function initTabs() {
             switch (tabId) {
                 case 'kommuner':
                     document.getElementById('kommunerMedRooms').innerHTML = '';
+                    document.querySelector('#kapacitetTable tbody').innerHTML = '';
+                    resetStats()
                     loadKommuner();
                     break;
                 case 'kapacitet':
                     document.getElementById('#kapacitetTable tbody').innerHTML = '';
+                    document.querySelector('#kapacitetTable tbody').innerHTML = '';
+                    resetStats()
                     loadKommuner();
                     break;
                 case 'kort':
@@ -75,6 +85,7 @@ function loadRoomsForKommune(kommune) {
         .then(rooms => {
             renderKommuneMedRooms(kommune, rooms);
             renderKapacitetRow(kommune, rooms);
+            updateStats(kommune.id, rooms);
         })
         .catch(error => console.error('Fejl ved hentning af beskyttelsesrum:', error));
 }
@@ -305,8 +316,35 @@ function refreshAllData() {
     // Ryd eksisterende data
     document.getElementById('kommunerMedRooms').innerHTML = '';
     document.querySelector('#kapacitetTable tbody').innerHTML = '';
+    resetStats();
 
     // Genindlæs alt
     loadKommuner();
     loadAllRooms();
+}
+
+// ============ STATISTIK ============
+
+function resetStats() {
+    statsData = {
+        kommunerMedRum: new Set(),
+        totalRooms: 0,
+        totalKapacitet: 0
+    };
+}
+
+function updateStats(kommuneId, rooms) {
+    if (rooms.length > 0) {
+        statsData.kommunerMedRum.add(kommuneId);
+    }
+    statsData.totalRooms += rooms.length;
+    statsData.totalKapacitet += rooms.reduce((sum, r) => sum + r.kapacitet, 0);
+
+    renderStats();
+}
+
+function renderStats() {
+    document.getElementById('statKommuner').textContent = statsData.kommunerMedRum.size;
+    document.getElementById('statRooms').textContent = statsData.totalRooms;
+    document.getElementById('statKapacitet').textContent = statsData.totalKapacitet.toLocaleString('da-DK');
 }
