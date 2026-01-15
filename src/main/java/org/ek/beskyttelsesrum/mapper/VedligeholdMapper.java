@@ -39,6 +39,7 @@ public class VedligeholdMapper {
         response.setStatus(vedligeholdelse.getStatus().name());
         response.setBeskyttelsesrumId(vedligeholdelse.getBeskyttelsesrum().getId());
         response.setBeskyttelsesrumAdresse(vedligeholdelse.getBeskyttelsesrum().getAdresse());
+        response.setKommuneNavn(vedligeholdelse.getBeskyttelsesrum().getKommune().getNavn());
         return response;
     }
 }

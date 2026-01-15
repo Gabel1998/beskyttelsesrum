@@ -18,4 +18,5 @@ public class VedligeholdResponse {
     private String status;
     private Long beskyttelsesrumId;
     private String beskyttelsesrumAdresse;
+    private String kommuneNavn;
 }

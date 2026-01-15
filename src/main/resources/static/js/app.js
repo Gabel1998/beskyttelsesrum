@@ -368,15 +368,36 @@ function renderStats() {
 
 // ============ SØGEFUNKTION ============
 
+
 function searchKommune() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
 
     if (!searchTerm) {
-        alert('Indtast en kommune at søge efter');
+        resetSearch();
         return;
     }
 
-    // Find matchende kommuner
+    // Find aktiv tab
+    const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
+
+    switch (activeTab) {
+        case 'kommuner':
+        case 'kapacitet':
+            searchInKommuner(searchTerm);
+            break;
+        case 'kort':
+            searchInKommuner(searchTerm);
+            break;
+        case 'admin':
+            searchInAdmin(searchTerm);
+            break;
+        case 'vedligehold':
+            searchInVedligehold(searchTerm);
+            break;
+    }
+}
+
+function searchInKommuner(searchTerm) {
     const matches = alleKommuner.filter(k =>
         k.navn.toLowerCase().includes(searchTerm) ||
         k.kode.includes(searchTerm)
@@ -387,7 +408,6 @@ function searchKommune() {
         return;
     }
 
-    // Ryd og vis kun matchende kommuner
     document.getElementById('kommunerMedRooms').innerHTML = '';
     document.querySelector('#kapacitetTable tbody').innerHTML = '';
     resetStats();
@@ -396,8 +416,38 @@ function searchKommune() {
         loadRoomsForKommune(kommune);
     });
 
-    // Zoom til første match på kortet
-    zoomToKommune(matches[0]);
+    // Kun zoom til kort hvis vi allerede er på kort-tab
+    if (activeTab === 'kort') {
+        zoomToKommune(matches[0]);
+    }
+}
+
+function searchInAdmin(searchTerm) {
+    fetch('/rooms')
+        .then(response => response.json())
+        .then(rooms => {
+            const filtered = rooms.filter(r =>
+                (r.adresse && r.adresse.toLowerCase().includes(searchTerm)) ||
+                (r.postalCode && r.postalCode.includes(searchTerm)) ||
+                (r.kommuneNavn && r.kommuneNavn.toLowerCase().includes(searchTerm))
+            );
+            renderAdminTable(filtered);
+        });
+}
+
+function searchInVedligehold(searchTerm) {
+    fetch('/vedligehold')
+        .then(response => response.json())
+        .then(data => {
+            const filtered = data.filter(v =>
+                (v.beskyttelsesrumAdresse && v.beskyttelsesrumAdresse.toLowerCase().includes(searchTerm)) ||
+                (v.kommuneNavn && v.kommuneNavn.toLowerCase().includes(searchTerm)) ||
+                (v.beskrivelse && v.beskrivelse.toLowerCase().includes(searchTerm)) ||
+                (v.udfoertAf && v.udfoertAf.toLowerCase().includes(searchTerm)) ||
+                (v.status && v.status.toLowerCase().includes(searchTerm))
+            );
+            renderVedligeholdTable(filtered);
+        });
 }
 
 function zoomToKommune(kommune) {
@@ -429,8 +479,28 @@ function zoomToKommune(kommune) {
 
 function resetSearch() {
     document.getElementById('searchInput').value = '';
-    refreshAllData();
-    map.setView([56.0, 10.5], 7);
+
+    const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
+
+    switch (activeTab) {
+        case 'kommuner':
+        case 'kapacitet':
+            document.getElementById('kommunerMedRooms').innerHTML = '';
+            document.querySelector('#kapacitetTable tbody').innerHTML = '';
+            resetStats();
+            loadKommuner();
+            break;
+        case 'kort':
+            map.setView([56.0, 10.5], 7);
+            loadAllRooms();
+            break;
+        case 'admin':
+            loadAllRooms();
+            break;
+        case 'vedligehold':
+            loadVedligeholdelser();
+            break;
+    }
 }
 
 
@@ -451,13 +521,12 @@ function renderVedligeholdTable(vedligeholdelser) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${v.dato || ''}</td>
-            <td>${v.beskyttelsesrumAdresse || ''}</td>
+            <td>${v.beskyttelsesrumAdresse || ''}, ${v.kommuneNavn || ''}</td>
             <td>${v.beskrivelse || ''}</td>
             <td>${v.udfoertAf || ''}</td>
             <td><span class="status-badge status-${v.status}">${formatStatus(v.status)}</span></td>
             <td>
                 <button class="btn-edit" onclick="editVedligehold(${v.id})">Rediger</button>
-                <button class="btn-delete" onclick="deleteVedligehold(${v.id})">Slet</button>
             </td>
         `;
         tbody.appendChild(row);
@@ -475,7 +544,7 @@ function formatStatus(status) {
 }
 
 function loadRoomsDropdown() {
-    fetch('/rooms')
+    return fetch('/rooms')
         .then(response => response.json())
         .then(rooms => {
             const select = document.getElementById('vedligeholdBeskyttelsesrumId');
@@ -492,20 +561,25 @@ function loadRoomsDropdown() {
 function openVedligeholdModal(id = null) {
     const modal = document.getElementById('vedligeholdModal');
     const title = document.getElementById('vedligeholdModalTitle');
+    const deleteBtn = document.getElementById('vedligeholdDeleteBtn');
 
-    loadRoomsDropdown();
+    loadRoomsDropdown().then(() => {
+        if (id) {
+            title.textContent = 'Rediger vedligeholdelse';
+            deleteBtn.style.display = 'inline-block';
+            deleteBtn.onclick = () => deleteVedligehold(id);
+            loadVedligeholdIntoForm(id);
+        } else {
+            title.textContent = 'Opret vedligeholdelse';
+            deleteBtn.style.display = 'none';
+            clearVedligeholdForm();
+            document.getElementById('vedligeholdDato').value = new Date().toISOString().split('T')[0];
+        }
 
-    if (id) {
-        title.textContent = 'Rediger vedligeholdelse';
-        loadVedligeholdIntoForm(id);
-    } else {
-        title.textContent = 'Opret vedligeholdelse';
-        clearVedligeholdForm();
-        document.getElementById('vedligeholdDato').value = new Date().toISOString().split('T')[0];
-    }
-
-    modal.classList.add('active');
+        modal.classList.add('active');
+    });
 }
+
 
 function closeVedligeholdModal() {
     document.getElementById('vedligeholdModal').classList.remove('active');
@@ -541,13 +615,14 @@ function deleteVedligehold(id) {
     fetch(`/vedligehold/${id}`, {method: 'DELETE'})
         .then(() => {
             loadVedligeholdelser();
+            closeVedligeholdModal();
             alert('Vedligeholdelse slettet');
         })
         .catch(error => console.error('Fejl ved sletning:', error));
 }
 
 // Init vedligehold form
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('vedligeholdForm');
     if (form) {
         form.addEventListener('submit', handleVedligeholdSubmit);
