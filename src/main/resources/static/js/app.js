@@ -25,6 +25,13 @@ document.addEventListener("DOMContentLoaded", function () {
     loadAllRooms();
     initForm();
     initMap();
+
+    // Søgning med Enter-tast
+    document.getElementById('searchInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            searchKommune();
+        }
+    });
 });
 
 
@@ -77,6 +84,7 @@ function loadKommuner() {
     fetch("/kommuner")
         .then(response => response.json())
         .then(kommuner => {
+            alleKommuner = kommuner;
             kommuner.forEach(kommune => {
                 loadRoomsForKommune(kommune);
             });
