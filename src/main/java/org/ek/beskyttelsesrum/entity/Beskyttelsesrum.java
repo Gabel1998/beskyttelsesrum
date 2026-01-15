@@ -6,10 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Beskyttelsesrum
- * Hvert beskyttelsesrum tilhører en Kommune
+ * Repræsenterer et beskyttelsesrum.
+ * Hvert beskyttelsesrum tilhører én kommune.
  */
-
 @Entity
 @Getter
 @Setter
@@ -19,19 +18,27 @@ public class Beskyttelsesrum {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String adresse;
-    private String postnummer;
+
+    private String postalCode;
 
     private int kapacitet;
+
+    private Double latitude;
+
+    private Double longitude;
 
     @ManyToOne
     @JoinColumn(name = "kommune_id")
     private Kommune kommune;
 
-    public Beskyttelsesrum(String adresse, String postnummer, int kapacitet, Kommune kommune) {
+    public Beskyttelsesrum(String adresse, String postalCode, int kapacitet, Double latitude, Double longitude, Kommune kommune) {
         this.adresse = adresse;
-        this.postnummer = postnummer;
+        this.postalCode = postalCode;
         this.kapacitet = kapacitet;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.kommune = kommune;
     }
 }
