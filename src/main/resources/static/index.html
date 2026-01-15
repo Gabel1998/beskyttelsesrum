@@ -3,69 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beskyttelsesrum</title>
+    <title>Beskyttelsesrum Danmark</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
 <body>
-<h1>Beskyttelsesrum i Danmark</h1>
 
-<!-- Navigation -->
-<nav class="tabs">
-    <button class="tab-btn active" data-tab="kommuner">Kommuner</button>
-    <button class="tab-btn" data-tab="kapacitet">Kapacitet</button>
-    <button class="tab-btn" data-tab="kort">Kort</button>
-    <button class="tab-btn" data-tab="admin">Administrer</button>
-</nav>
+<!-- Header -->
+<header class="header">
+    <div class="header-content">
+        <h1> Beskyttelsesrum i Danmark</h1>
+        <p>Overblik over kommunale beskyttelsesrum og deres kapacitet</p>
+    </div>
+</header>
 
-<!-- TAB: Kommuner med beskyttelsesrum -->
-<div id="kommuner" class="tab-content active">
-    <h2>Kommuner og deres beskyttelsesrum</h2>
-    <div id="kommunerMedRooms"></div>
-</div>
+<!-- Statistik Dashboard -->
+<section class="stats-dashboard">
+    <div class="stat-card">
+        <span class="stat-number" id="statKommuner">0</span>
+        <span class="stat-label">Kommuner</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-number" id="statRooms">0</span>
+        <span class="stat-label">Beskyttelsesrum</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-number" id="statKapacitet">0</span>
+        <span class="stat-label">Total kapacitet</span>
+    </div>
+</section>
 
-<!-- TAB: Kapacitet -->
-<div id="kapacitet" class="tab-content">
-    <h2>Kommuner og samlet kapacitet</h2>
-    <table id="kapacitetTable">
-        <thead>
-        <tr>
-            <th>Kode</th>
-            <th>Kommune</th>
-            <th>Antal rum</th>
-            <th>Samlet kapacitet</th>
-        </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Navigation -->
+    <nav class="tabs">
+        <button class="tab-btn active" data-tab="kommuner"> Kommuner</button>
+        <button class="tab-btn" data-tab="kapacitet"> Kapacitet</button>
+        <button class="tab-btn" data-tab="kort"> Kort</button>
+        <button class="tab-btn" data-tab="admin">Administrer</button>
+    </nav>
 
-<!-- TAB: Kort -->
-<div id="kort" class="tab-content">
-    <h2>Beskyttelsesrum på kort</h2>
-    <div id="map"></div>
-</div>
+    <!-- TAB: Kommuner med beskyttelsesrum -->
+    <div id="kommuner" class="tab-content active">
+        <div class="tab-header">
+            <h2>Kommuner og deres beskyttelsesrum</h2>
+            <p>Oversigt over alle registrerede beskyttelsesrum fordelt på kommuner</p>
+        </div>
+        <div id="kommunerMedRooms" class="kommune-grid"></div>
+    </div>
 
-<!-- TAB: Admin -->
-<div id="admin" class="tab-content">
-    <h2>Administrering af beskyttelsesrum</h2>
+    <!-- TAB: Kapacitet -->
+    <div id="kapacitet" class="tab-content">
+        <div class="tab-header">
+            <h2>Kapacitetsoversigt</h2>
+            <p>Samlet kapacitet og antal beskyttelsesrum per kommune</p>
+        </div>
+        <div class="table-container">
+            <table id="kapacitetTable">
+                <thead>
+                <tr>
+                    <th>Kode</th>
+                    <th>Kommune</th>
+                    <th>Antal rum</th>
+                    <th>Samlet kapacitet</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
 
-    <button class="btn-create" onclick="openModal()">+ Opret nyt beskyttelsesrum</button>
+    <!-- TAB: Kort -->
+    <div id="kort" class="tab-content">
+        <div class="tab-header">
+            <h2>Kortvisning</h2>
+            <p>Se alle beskyttelsesrum placeret på kortet</p>
+        </div>
+        <div id="map"></div>
+    </div>
 
-    <h3>Eksisterende beskyttelsesrum</h3>
-    <table id="roomsTable">
-        <thead>
-        <tr>
-            <th>Adresse</th>
-            <th>Postnr</th>
-            <th>Kapacitet</th>
-            <th>Kommune</th>
-            <th>Handlinger</th>
-        </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
+    <!-- TAB: Admin -->
+    <div id="admin" class="tab-content">
+        <div class="tab-header">
+            <h2>Administrer beskyttelsesrum</h2>
+            <p>Opret, rediger og slet beskyttelsesrum</p>
+        </div>
+
+        <button class="btn-create" onclick="openModal()">+ Opret nyt beskyttelsesrum</button>
+
+        <div class="table-container">
+            <table id="roomsTable">
+                <thead>
+                <tr>
+                    <th>Adresse</th>
+                    <th>Postnr</th>
+                    <th>Kapacitet</th>
+                    <th>Kommune</th>
+                    <th>Handlinger</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>Eksamensprojekt – KEA 2026</p>
+</footer>
 
 <!-- Modal -->
 <div id="modal" class="modal">
@@ -76,29 +122,43 @@
         <form id="roomForm">
             <input type="hidden" id="roomId">
 
-            <label for="adresse">Adresse:</label>
-            <input type="text" id="adresse" name="adresse" required>
+            <div class="form-group">
+                <label for="adresse">Adresse</label>
+                <input type="text" id="adresse" name="adresse" placeholder="Indtast adresse..." required>
+            </div>
 
-            <label for="postalCode">Postnummer:</label>
-            <input type="text" id="postalCode" name="postalCode" required>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="postalCode">Postnummer</label>
+                    <input type="text" id="postalCode" name="postalCode" placeholder="F.eks. 2200" required>
+                </div>
+                <div class="form-group">
+                    <label for="kapacitetInput">Kapacitet</label>
+                    <input type="number" id="kapacitetInput" name="kapacitet" placeholder="Antal personer" required>
+                </div>
+            </div>
 
-            <label for="kapacitetInput">Kapacitet:</label>
-            <input type="number" id="kapacitetInput" name="kapacitet" required>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="latitude">Latitude</label>
+                    <input type="number" id="latitude" step="any" name="latitude" placeholder="F.eks. 55.6761" required>
+                </div>
+                <div class="form-group">
+                    <label for="longitude">Longitude</label>
+                    <input type="number" id="longitude" step="any" name="longitude" placeholder="F.eks. 12.5683" required>
+                </div>
+            </div>
 
-            <label for="latitude">Latitude:</label>
-            <input type="number" id="latitude" step="any" name="latitude" required>
-
-            <label for="longitude">Longitude:</label>
-            <input type="number" id="longitude" step="any" name="longitude" required>
-
-            <label for="kommuneId">Kommune:</label>
-            <select id="kommuneId" name="kommuneId" required>
-                <option value="">Vælg en kommune...</option>
-            </select>
+            <div class="form-group">
+                <label for="kommuneId">Kommune</label>
+                <select id="kommuneId" name="kommuneId" required>
+                    <option value="">Vælg en kommune...</option>
+                </select>
+            </div>
 
             <div class="form-buttons">
-                <button type="submit">Gem</button>
-                <button type="button" onclick="closeModal()">Annuller</button>
+                <button type="button" class="btn-secondary" onclick="closeModal()">Annuller</button>
+                <button type="submit" class="btn-primary">Gem</button>
             </div>
         </form>
     </div>
