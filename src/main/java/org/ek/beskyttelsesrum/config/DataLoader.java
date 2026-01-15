@@ -22,8 +22,15 @@ public class DataLoader implements CommandLineRunner {
         this.kommuneRepository = kommuneRepository;
     }
 
+
     @Override
     public void run(String... args) {
+        // Tjek om kommuner allerede er loaded
+        if (kommuneRepository.count() > 0) {
+            System.out.println("Kommuner allerede loaded (" + kommuneRepository.count() + " stk), springer over.");
+            return;
+        }
+
         try {
             RestTemplate restTemplate = new RestTemplate();
             String url = "https://api.dataforsyningen.dk/kommuner";
