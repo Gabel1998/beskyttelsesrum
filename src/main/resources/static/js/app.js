@@ -93,17 +93,17 @@ function loadRoomsForKommune(kommune) {
 function renderKommuneMedRooms(kommune, rooms) {
     const container = document.getElementById('kommunerMedRooms');
     const div = document.createElement('div');
+    div.className = 'kommune-card';
 
     const roomsHtml = rooms.length > 0
         ? rooms.map(r => `${r.adresse}, ${r.postalCode} - Kapacitet: ${r.kapacitet}`).join('<br>')
         : 'Ingen beskyttelsesrum registreret';
 
     div.innerHTML = `
-    <div class="kommune-header">${kommune.kode} - ${kommune.navn}</div>
-    <div class="rooms-list">${roomsHtml}</div>
+        <div class="kommune-header">${kommune.kode} - ${kommune.navn}</div>
+        <div class="rooms-list">${roomsHtml}</div>
     `;
     container.appendChild(div);
-
 }
 
 function renderKapacitetRow(kommune, rooms) {
