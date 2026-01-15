@@ -2,14 +2,20 @@
  * Hovedscript til Beskyttelsesrum SPA.
  * Henter og viser kommuner og deres beskyttelsesrum.
  */
+//Leaflet bruger
 let map;
 let markers = [];
 
+//Statistikker bruger
 let statsData = {
     kommunerMedRum: new Set(),
     totalRooms: 0,
     totalKapacitet: 0
 };
+
+//Søgefunktion bruger
+let alleKommuner = [];
+
 
 // ============ INITIALISERING ============
 document.addEventListener("DOMContentLoaded", function () {
@@ -347,4 +353,71 @@ function renderStats() {
     document.getElementById('statKommuner').textContent = statsData.kommunerMedRum.size;
     document.getElementById('statRooms').textContent = statsData.totalRooms;
     document.getElementById('statKapacitet').textContent = statsData.totalKapacitet.toLocaleString('da-DK');
+}
+
+// ============ SØGEFUNKTION ============
+
+function searchKommune() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+
+    if (!searchTerm) {
+        alert('Indtast en kommune at søge efter');
+        return;
+    }
+
+    // Find matchende kommuner
+    const matches = alleKommuner.filter(k =>
+        k.navn.toLowerCase().includes(searchTerm) ||
+        k.kode.includes(searchTerm)
+    );
+
+    if (matches.length === 0) {
+        alert('Ingen kommuner fundet');
+        return;
+    }
+
+    // Ryd og vis kun matchende kommuner
+    document.getElementById('kommunerMedRooms').innerHTML = '';
+    document.querySelector('#kapacitetTable tbody').innerHTML = '';
+    resetStats();
+
+    matches.forEach(kommune => {
+        loadRoomsForKommune(kommune);
+    });
+
+    // Zoom til første match på kortet
+    zoomToKommune(matches[0]);
+}
+
+function zoomToKommune(kommune) {
+    fetch(`/kommuner/${kommune.id}/rooms`)
+        .then(response => response.json())
+        .then(rooms => {
+            const roomsWithCoords = rooms.filter(r => r.latitude && r.longitude);
+
+            if (roomsWithCoords.length > 0) {
+                // Zoom til første beskyttelsesrum i kommunen
+                const firstRoom = roomsWithCoords[0];
+                map.setView([firstRoom.latitude, firstRoom.longitude], 13);
+
+                // Åbn popup
+                markers.forEach(marker => {
+                    const latLng = marker.getLatLng();
+                    if (latLng.lat === firstRoom.latitude && latLng.lng === firstRoom.longitude) {
+                        marker.openPopup();
+                    }
+                });
+
+                // Skift til kort-tab
+                document.querySelector('[data-tab="kort"]').click();
+            } else {
+                alert(`Ingen beskyttelsesrum med koordinater i ${kommune.navn}`);
+            }
+        });
+}
+
+function resetSearch() {
+    document.getElementById('searchInput').value = '';
+    refreshAllData();
+    map.setView([56.0, 10.5], 7);
 }
