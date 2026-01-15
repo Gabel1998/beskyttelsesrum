@@ -19,7 +19,7 @@ Full-stack REST web-applikation til overblik over danske beskyttelsesrum.
 ### 1. Klon repository
 
 ```bash
-git clone <https://github.com/Gabel1998/beskyttelsesrum/tree/main>
+git clone https://github.com/Gabel1998/beskyttelsesrum/tree/main
 cd Beskyttelsesrum
 ```
 
