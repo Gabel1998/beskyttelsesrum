@@ -50,34 +50,7 @@
 <div id="admin" class="tab-content">
     <h2>Administrering af beskyttelsesrum</h2>
 
-    <form id="roomForm">
-        <input type="hidden" id="roomId">
-
-        <label for="adresse">Adresse:</label>
-        <input type="text" id="adresse" name="adresse" required>
-
-        <label for="postalCode">Postnummer:</label>
-        <input type="text" id="postalCode" name="postalCode" required>
-
-        <label for="kapacitetInput">Kapacitet:</label>
-        <input type="number" id="kapacitetInput" name="kapacitet" required>
-
-        <label for="latitude">Latitude:</label>
-        <input type="number" id="latitude" step="any" name="latitude" required>
-
-        <label for="longitude">Longitude:</label>
-        <input type="number" id="longitude" step="any" name="longitude" required>
-
-        <label for="kommuneId">Kommune:</label>
-        <select id="kommuneId" name="kommuneId" required>
-            <option value="">Vælg en kommune...</option>
-        </select>
-
-        <div class="form-buttons">
-            <button type="submit">Gem</button>
-            <button type="button" id="clearForm">Ryd</button>
-        </div>
-    </form>
+    <button class="btn-create" onclick="openModal()">+ Opret nyt beskyttelsesrum</button>
 
     <h3>Eksisterende beskyttelsesrum</h3>
     <table id="roomsTable">
@@ -92,6 +65,43 @@
         </thead>
         <tbody></tbody>
     </table>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle">Opret beskyttelsesrum</h2>
+
+        <form id="roomForm">
+            <input type="hidden" id="roomId">
+
+            <label for="adresse">Adresse:</label>
+            <input type="text" id="adresse" name="adresse" required>
+
+            <label for="postalCode">Postnummer:</label>
+            <input type="text" id="postalCode" name="postalCode" required>
+
+            <label for="kapacitetInput">Kapacitet:</label>
+            <input type="number" id="kapacitetInput" name="kapacitet" required>
+
+            <label for="latitude">Latitude:</label>
+            <input type="number" id="latitude" step="any" name="latitude" required>
+
+            <label for="longitude">Longitude:</label>
+            <input type="number" id="longitude" step="any" name="longitude" required>
+
+            <label for="kommuneId">Kommune:</label>
+            <select id="kommuneId" name="kommuneId" required>
+                <option value="">Vælg en kommune...</option>
+            </select>
+
+            <div class="form-buttons">
+                <button type="submit">Gem</button>
+                <button type="button" onclick="closeModal()">Annuller</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

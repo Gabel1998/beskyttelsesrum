@@ -144,8 +144,6 @@ function renderRoomsTable(rooms) {
 function initForm() {
     const form = document.getElementById('roomForm');
     form.addEventListener(`submit`, handleSubmit);
-
-    document.getElementById(`clearForm`).addEventListener(`click`, clearForm);
 }
 
 function handleSubmit(e) {
@@ -169,52 +167,37 @@ function handleSubmit(e) {
 }
 
 function createRoom(data) {
-    fetch(`/rooms`, {
+    fetch('/rooms', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-        .then(response => response.json())
-        .then(() => {
-            clearForm();
-            loadAllRooms();
-            alert(`Beskyttelsesrum med id ${data.id} oprettet`);
-        })
-        .catch(error => console.error('Fejl ved oprettelse af beskyttelsesrum:', error));
+    .then(response => response.json())
+    .then(() => {
+        closeModal();
+        loadAllRooms();
+    })
+    .catch(error => console.error('Fejl ved oprettelse:', error));
 }
 
 function updateRoom(id, data) {
     fetch(`/rooms/${id}`, {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-        .then(response => response.json())
-        .then(() => {
-            clearForm();
-            loadAllRooms();
-            alert(`Beskyttelsesrum med id ${id} opdateret`);
-        })
-        .catch(error => console.error('Fejl ved opdatering af beskyttelsesrum:', error));
+    .then(response => response.json())
+    .then(() => {
+        closeModal();
+        loadAllRooms();
+    })
+    .catch(error => console.error('Fejl ved opdatering:', error));
 }
 
 
+
 function editRoom(id) {
-    fetch(`/rooms/${id}`)
-        .then(response => response.json())
-        .then(room => {
-            document.getElementById(`roomId`).value = room.id;
-            document.getElementById(`adresse`).value = room.adresse;
-            document.getElementById(`postalCode`).value = room.postalCode;
-            document.getElementById(`kapacitetInput`).value = room.kapacitet;
-            document.getElementById(`latitude`).value = room.latitude || '';
-            document.getElementById(`longitude`).value = room.longitude || '';
-            document.getElementById(`kommuneId`).value = room.kommuneId;
-        })
+    openModal(id);
 }
 
 function deleteRoom(id) {
@@ -264,4 +247,40 @@ function updateMapMarkers(rooms) {
             markers.push(marker);
         }
     });
+}
+
+// ============ MODAL ============
+
+function openModal(id = null) {
+    const modal = document.getElementById('modal');
+    const title = document.getElementById('modalTitle');
+
+    if (id) {
+        title.textContent = 'Rediger beskyttelsesrum';
+        loadRoomIntoForm(id);
+    } else {
+        title.textContent = 'Opret beskyttelsesrum';
+        clearForm();
+    }
+
+    modal.classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+    clearForm();
+}
+
+function loadRoomIntoForm(id) {
+    fetch(`/rooms/${id}`)
+        .then(response => response.json())
+        .then(room => {
+            document.getElementById('roomId').value = room.id;
+            document.getElementById('adresse').value = room.adresse;
+            document.getElementById('postalCode').value = room.postalCode;
+            document.getElementById('kapacitetInput').value = room.kapacitet;
+            document.getElementById('latitude').value = room.latitude || '';
+            document.getElementById('longitude').value = room.longitude || '';
+            document.getElementById('kommuneId').value = room.kommuneId;
+        });
 }

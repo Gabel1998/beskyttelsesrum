@@ -246,3 +246,89 @@ tr:hover {
     border-radius: var(--border-radius);
     border: 1px solid var(--color-grey-light);
 }
+
+/* Opret knap */
+.btn-create {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: 12px 24px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: var(--font-size-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.btn-create:hover {
+    background-color: var(--color-primary-dark);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: var(--color-white);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius);
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--color-grey);
+}
+
+.modal-close:hover {
+    color: var(--color-grey-dark);
+}
+
+.modal-content h2 {
+    margin-bottom: var(--spacing-lg);
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.modal-content label {
+    font-weight: bold;
+    margin-top: var(--spacing-sm);
+}
+
+.modal-content input,
+.modal-content select {
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-grey-light);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-sm);
+}
+
+.modal-content .form-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-lg);
+}
