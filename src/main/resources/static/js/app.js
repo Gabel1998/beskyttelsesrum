@@ -31,9 +31,24 @@ function initTabs() {
             const tabId = btn.getAttribute('data-tab');
             document.getElementById(tabId).classList.add('active');
 
-            //Refresh kort når tab åbnes
-            if (tabId === 'kort' && map) {
-                setTimeout(() => map.invalidateSize(), 100)
+            //Refresh data baseret på tab
+            switch (tabId) {
+                case 'kommuner':
+                    document.getElementById('kommunerMedRooms').innerHTML = '';
+                    loadKommuner();
+                    break;
+                case 'kapacitet':
+                    document.getElementById('#kapacitetTable tbody').innerHTML = '';
+                    loadKommuner();
+                    break;
+                case 'kort':
+                    setTimeout(() => map.invalidateSize(), 100);
+                    loadAllRooms()
+                    break;
+                case 'admin':
+                    loadAllRooms();
+                    break;
+
             }
         })
     })
@@ -169,31 +184,30 @@ function handleSubmit(e) {
 function createRoom(data) {
     fetch('/rooms', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
-    .then(() => {
-        closeModal();
-        loadAllRooms();
-    })
-    .catch(error => console.error('Fejl ved oprettelse:', error));
+        .then(response => response.json())
+        .then(() => {
+            closeModal();
+            refreshAllData();
+        })
+        .catch(error => console.error('Fejl ved oprettelse:', error));
 }
 
 function updateRoom(id, data) {
     fetch(`/rooms/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
-    .then(() => {
-        closeModal();
-        loadAllRooms();
-    })
-    .catch(error => console.error('Fejl ved opdatering:', error));
+        .then(response => response.json())
+        .then(() => {
+            closeModal();
+            refreshAllData();
+        })
+        .catch(error => console.error('Fejl ved opdatering:', error));
 }
-
 
 
 function editRoom(id) {
@@ -206,7 +220,7 @@ function deleteRoom(id) {
     }
     fetch(`/rooms/${id}`, {method: 'DELETE'})
         .then(() => {
-            loadAllRooms();
+            refreshAllData();
             alert(`Beskyttelsesrum med id ${id} slettet`);
         })
         .catch(error => console.error('Fejl ved sletning af beskyttelsesrum:', error));
@@ -283,4 +297,16 @@ function loadRoomIntoForm(id) {
             document.getElementById('longitude').value = room.longitude || '';
             document.getElementById('kommuneId').value = room.kommuneId;
         });
+}
+
+// ============ REFRESH DATA ============
+
+function refreshAllData() {
+    // Ryd eksisterende data
+    document.getElementById('kommunerMedRooms').innerHTML = '';
+    document.querySelector('#kapacitetTable tbody').innerHTML = '';
+
+    // Genindlæs alt
+    loadKommuner();
+    loadAllRooms();
 }
