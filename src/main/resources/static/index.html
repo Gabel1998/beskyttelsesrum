@@ -1,10 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beskyttelsesrum</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<h1>Beskyttelsesrum i Danmark</h1>
 
+<!-- Visning 1: Kommuner med beskyttelsesrum -->
+<h2>Kommuner og deres beskyttelsesrum</h2>
+<div id="kommunerMedRooms"></div>
+
+<!-- Visning 2: Kommuner med samlet kapacitet -->
+<h2>Kommuner og samlet kapacitet</h2>
+<table id="kapacitetTable">
+    <thead>
+    <tr>
+        <th>Kode</th>
+        <th>Kommune</th>
+        <th>Antal rum</th>
+        <th>Samlet kapacitet</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script src="js/app.js"></script>
 </body>
 </html>

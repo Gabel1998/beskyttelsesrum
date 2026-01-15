@@ -9,7 +9,5 @@ public interface BeskyttelsesrumRepository extends JpaRepository<Beskyttelsesrum
 
     List<Beskyttelsesrum> findAllByOrderByAdresseAsc();
 
-    List<Beskyttelsesrum> findAllByKommune_Name(String kommune);
-
     List<Beskyttelsesrum> findByKommuneId(Long kommuneId );
 }
