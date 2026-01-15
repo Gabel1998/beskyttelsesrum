@@ -18,9 +18,11 @@ public class Kommune {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String kode; //Kommune kode fra API
 
-    public Kommune(String name) {
+    public Kommune(String name, String kode) {
         this.name = name;
+        this.kode = kode;
     }
 
 

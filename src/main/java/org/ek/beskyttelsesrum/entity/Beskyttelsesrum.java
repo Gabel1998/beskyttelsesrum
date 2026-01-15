@@ -5,6 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Beskyttelsesrum
+ * Hvert beskyttelsesrum tilhører en Kommune
+ */
+
 @Entity
 @Getter
 @Setter
