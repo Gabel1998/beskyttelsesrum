@@ -49,7 +49,7 @@ public ResponseEntity<List<BeskyttelsesrumResponse>> getAll(){
 /**
  * Henter et beskyttelsesrum by ID
  */
-@GetMapping("{/id}")
+@GetMapping("/{id}")
 public ResponseEntity<BeskyttelsesrumResponse> getById(@PathVariable Long id){
     return beskyttelsesrumRepository.findById(id)
             .map(mapper::toResponse)

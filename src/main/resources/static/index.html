@@ -5,28 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beskyttelsesrum</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
 <body>
 <h1>Beskyttelsesrum i Danmark</h1>
 
-<!-- Visning 1: Kommuner med beskyttelsesrum -->
-<h2>Kommuner og deres beskyttelsesrum</h2>
-<div id="kommunerMedRooms"></div>
+<!-- Navigation -->
+<nav class="tabs">
+    <button class="tab-btn active" data-tab="kommuner">Kommuner</button>
+    <button class="tab-btn" data-tab="kapacitet">Kapacitet</button>
+    <button class="tab-btn" data-tab="kort">Kort</button>
+    <button class="tab-btn" data-tab="admin">Administrer</button>
+</nav>
 
-<!-- Visning 2: Kommuner med samlet kapacitet -->
-<h2>Kommuner og samlet kapacitet</h2>
-<table id="kapacitetTable">
-    <thead>
-    <tr>
-        <th>Kode</th>
-        <th>Kommune</th>
-        <th>Antal rum</th>
-        <th>Samlet kapacitet</th>
-    </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+<!-- TAB: Kommuner med beskyttelsesrum -->
+<div id="kommuner" class="tab-content active">
+    <h2>Kommuner og deres beskyttelsesrum</h2>
+    <div id="kommunerMedRooms"></div>
+</div>
 
+<!-- TAB: Kapacitet -->
+<div id="kapacitet" class="tab-content">
+    <h2>Kommuner og samlet kapacitet</h2>
+    <table id="kapacitetTable">
+        <thead>
+        <tr>
+            <th>Kode</th>
+            <th>Kommune</th>
+            <th>Antal rum</th>
+            <th>Samlet kapacitet</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- TAB: Kort -->
+<div id="kort" class="tab-content">
+    <h2>Beskyttelsesrum på kort</h2>
+    <div id="map"></div>
+</div>
+
+<!-- TAB: Admin -->
+<div id="admin" class="tab-content">
+    <h2>Administrering af beskyttelsesrum</h2>
+
+    <form id="roomForm">
+        <input type="hidden" id="roomId">
+
+        <label for="adresse">Adresse:</label>
+        <input type="text" id="adresse" name="adresse" required>
+
+        <label for="postalCode">Postnummer:</label>
+        <input type="text" id="postalCode" name="postalCode" required>
+
+        <label for="kapacitetInput">Kapacitet:</label>
+        <input type="number" id="kapacitetInput" name="kapacitet" required>
+
+        <label for="latitude">Latitude:</label>
+        <input type="number" id="latitude" step="any" name="latitude" required>
+
+        <label for="longitude">Longitude:</label>
+        <input type="number" id="longitude" step="any" name="longitude" required>
+
+        <label for="kommuneId">Kommune:</label>
+        <select id="kommuneId" name="kommuneId" required>
+            <option value="">Vælg en kommune...</option>
+        </select>
+
+        <div class="form-buttons">
+            <button type="submit">Gem</button>
+            <button type="button" id="clearForm">Ryd</button>
+        </div>
+    </form>
+
+    <h3>Eksisterende beskyttelsesrum</h3>
+    <table id="roomsTable">
+        <thead>
+        <tr>
+            <th>Adresse</th>
+            <th>Postnr</th>
+            <th>Kapacitet</th>
+            <th>Kommune</th>
+            <th>Handlinger</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
