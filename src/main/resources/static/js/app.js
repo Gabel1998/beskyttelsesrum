@@ -104,7 +104,7 @@ function loadKommunerDropdown() {
             kommuner.forEach(k => {
                 const option = document.createElement('option');
                 option.value = k.id;
-                option.textContent = '${k.kode} - ${k.navn}';
+                option.textContent = `${k.kode} - ${k.navn}`;
                 select.appendChild(option);
             });
         });
@@ -155,7 +155,7 @@ function handleSubmit(e) {
     const data = {
         adresse: document.getElementById(`adresse`).value,
         postalCode: document.getElementById(`postalCode`).value,
-        kapacitet: parseInt(document.getElementById(`kapacitet`).value),
+        kapacitet: parseInt(document.getElementById(`kapacitetInput`).value),
         latitude: parseInt(document.getElementById(`latitude`).value),
         longitude: parseInt(document.getElementById(`longitude`).value),
         kommuneId: document.getElementById(`kommuneId`).value
@@ -240,7 +240,7 @@ function clearForm() {
 function initMap() {
     map = L.map(`map`).setView([56.0, 10.5], 7);
 
-    L.titleLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 }
@@ -255,7 +255,7 @@ function updateMapMarkers(rooms) {
         if (room.latitude && room.longitude) {
             const marker = L.marker([room.latitude, room.longitude])
                 .addTo(map)
-                .bindPopuo(`
+                .bindPopup(`
                     <strong>${room.adresse}</strong><br></br>
                     ${room.postalCode}<br>
                     Kapacitet: ${room.kapacitet}<br>
