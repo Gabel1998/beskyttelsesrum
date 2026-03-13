@@ -3,6 +3,7 @@ package org.ek.beskyttelsesrum.config;
 import org.ek.beskyttelsesrum.entity.Kommune;
 import org.ek.beskyttelsesrum.repository.KommuneRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,6 +15,7 @@ import java.util.Map;
  * Data gemmes i databasen så systemet ikke er afhængigt af API'et efterfølgende.
  */
 @Component
+@Order(1)
 public class DataLoader implements CommandLineRunner {
 
     private final KommuneRepository kommuneRepository;
