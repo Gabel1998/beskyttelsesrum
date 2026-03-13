@@ -2,6 +2,9 @@
  * Hovedscript til Beskyttelsesrum SPA.
  * Henter og viser kommuner og deres beskyttelsesrum.
  */
+// Dynamic API base URL for subpath routing
+const BASE_URL = window.location.pathname.startsWith('/beskyttelsesrum') ? '/beskyttelsesrum' : '';
+
 //Leaflet bruger
 let map;
 let markers = [];
@@ -84,7 +87,7 @@ function initTabs() {
 // ============ KOMMUNER VISNING ============
 
 function loadKommuner() {
-    fetch("/kommuner")
+    fetch(BASE_URL + "/kommuner")
         .then(response => response.json())
         .then(kommuner => {
             alleKommuner = kommuner;
@@ -97,7 +100,7 @@ function loadKommuner() {
 }
 
 function loadRoomsForKommune(kommune) {
-    fetch(`/kommuner/${kommune.id}/rooms`)
+    fetch(`${BASE_URL}/kommuner/${kommune.id}/rooms`)
         .then(response => response.json())
         .then(rooms => {
             renderKommuneMedRooms(kommune, rooms);
@@ -140,7 +143,7 @@ function renderKapacitetRow(kommune, rooms) {
 // ============ ADMIN - CRUD ============
 
 function loadKommunerDropdown() {
-    fetch('/kommuner')
+    fetch(BASE_URL + '/kommuner')
         .then(response => response.json())
         .then(kommuner => {
             const select = document.getElementById('kommuneId');
@@ -154,7 +157,7 @@ function loadKommunerDropdown() {
 }
 
 function loadAllRooms() {
-    fetch('/rooms')
+    fetch(BASE_URL + '/rooms')
         .then(response => response.json())
         .then(rooms => {
             renderRoomsTable(rooms);
@@ -210,7 +213,7 @@ function handleSubmit(e) {
 }
 
 function createRoom(data) {
-    fetch('/rooms', {
+    fetch(BASE_URL + '/rooms', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
@@ -224,7 +227,7 @@ function createRoom(data) {
 }
 
 function updateRoom(id, data) {
-    fetch(`/rooms/${id}`, {
+    fetch(`${BASE_URL}/rooms/${id}`, {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
@@ -246,7 +249,7 @@ function deleteRoom(id) {
     if (!confirm('Er du sikker på du vil slette dette beskyttelsesrum?')) {
         return;
     }
-    fetch(`/rooms/${id}`, {method: 'DELETE'})
+    fetch(`${BASE_URL}/rooms/${id}`, {method: 'DELETE'})
         .then(() => {
             refreshAllData();
             alert(`Beskyttelsesrum med id ${id} slettet`);
@@ -314,7 +317,7 @@ function closeModal() {
 }
 
 function loadRoomIntoForm(id) {
-    fetch(`/rooms/${id}`)
+    fetch(`${BASE_URL}/rooms/${id}`)
         .then(response => response.json())
         .then(room => {
             document.getElementById('roomId').value = room.id;
@@ -423,7 +426,7 @@ function searchInKommuner(searchTerm) {
 }
 
 function searchInAdmin(searchTerm) {
-    fetch('/rooms')
+    fetch(BASE_URL + '/rooms')
         .then(response => response.json())
         .then(rooms => {
             const filtered = rooms.filter(r =>
@@ -436,7 +439,7 @@ function searchInAdmin(searchTerm) {
 }
 
 function searchInVedligehold(searchTerm) {
-    fetch('/vedligehold')
+    fetch(BASE_URL + '/vedligehold')
         .then(response => response.json())
         .then(data => {
             const filtered = data.filter(v =>
@@ -451,7 +454,7 @@ function searchInVedligehold(searchTerm) {
 }
 
 function zoomToKommune(kommune) {
-    fetch(`/kommuner/${kommune.id}/rooms`)
+    fetch(`${BASE_URL}/kommuner/${kommune.id}/rooms`)
         .then(response => response.json())
         .then(rooms => {
             const roomsWithCoords = rooms.filter(r => r.latitude && r.longitude);
@@ -507,7 +510,7 @@ function resetSearch() {
 // ============ VEDLIGEHOLDELSE ============
 
 function loadVedligeholdelser() {
-    fetch('/vedligehold')
+    fetch(BASE_URL + '/vedligehold')
         .then(response => response.json())
         .then(data => renderVedligeholdTable(data))
         .catch(error => console.error('Fejl ved hentning af vedligeholdelser:', error));
@@ -544,7 +547,7 @@ function formatStatus(status) {
 }
 
 function loadRoomsDropdown() {
-    return fetch('/rooms')
+    return fetch(BASE_URL + '/rooms')
         .then(response => response.json())
         .then(rooms => {
             const select = document.getElementById('vedligeholdBeskyttelsesrumId');
@@ -592,7 +595,7 @@ function clearVedligeholdForm() {
 }
 
 function loadVedligeholdIntoForm(id) {
-    fetch(`/vedligehold/${id}`)
+    fetch(`${BASE_URL}/vedligehold/${id}`)
         .then(response => response.json())
         .then(v => {
             document.getElementById('vedligeholdId').value = v.id;
@@ -612,7 +615,7 @@ function deleteVedligehold(id) {
     if (!confirm('Er du sikker på du vil slette denne vedligeholdelse?')) {
         return;
     }
-    fetch(`/vedligehold/${id}`, {method: 'DELETE'})
+    fetch(`${BASE_URL}/vedligehold/${id}`, {method: 'DELETE'})
         .then(() => {
             loadVedligeholdelser();
             closeVedligeholdModal();
@@ -642,7 +645,7 @@ function handleVedligeholdSubmit(e) {
     };
 
     if (id) {
-        fetch(`/vedligehold/${id}`, {
+        fetch(`${BASE_URL}/vedligehold/${id}`, {
             method: 'PUT',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
@@ -653,7 +656,7 @@ function handleVedligeholdSubmit(e) {
             })
             .catch(error => console.error('Fejl ved opdatering:', error));
     } else {
-        fetch('/vedligehold', {
+        fetch(BASE_URL + '/vedligehold', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
